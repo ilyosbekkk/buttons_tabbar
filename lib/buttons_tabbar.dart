@@ -28,6 +28,7 @@ class ButtonsTabBar extends StatefulWidget implements PreferredSizeWidget {
     this.height = _kTabHeight,
     this.center = false,
     this.onTap,
+    this.width,
   }) : super(key: key) {
     assert(backgroundColor == null || decoration == null);
     assert(unselectedBackgroundColor == null || unselectedDecoration == null);
@@ -52,6 +53,8 @@ class ButtonsTabBar extends StatefulWidget implements PreferredSizeWidget {
   ///
   /// If [Color] is not provided, [Theme.of(context).accentColor] is used.
   final Color? backgroundColor;
+
+  final double? width;
 
   /// The background [Color] of the button on its unselected state.
   ///
@@ -272,11 +275,11 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
   _getCenterPadding(BuildContext context) {
     // get the screen width. This is used to check if we have an element off screen
     final RenderBox tabsParent =
-        _tabsParentKey.currentContext!.findRenderObject() as RenderBox;
+    _tabsParentKey.currentContext!.findRenderObject() as RenderBox;
     final double screenWidth = tabsParent.size.width;
 
     RenderBox renderBox =
-        _tabKeys.first.currentContext?.findRenderObject() as RenderBox;
+    _tabKeys.first.currentContext?.findRenderObject() as RenderBox;
     double size = renderBox.size.width;
     final double left = (screenWidth - size) / 2;
 
@@ -287,9 +290,9 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
   }
 
   Widget _buildButton(
-    int index,
-    Tab tab,
-  ) {
+      int index,
+      Tab tab,
+      ) {
     final double animationValue;
     if (index == _currentIndex) {
       animationValue = _animationController.value;
@@ -314,7 +317,8 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
               Colors.grey[300],
           boxShadow: widget.unselectedDecoration?.boxShadow,
           gradient: widget.unselectedDecoration?.gradient,
-          borderRadius: widget.unselectedDecoration?.borderRadius ?? BorderRadius.circular(widget.radius),
+          borderRadius: widget.unselectedDecoration?.borderRadius ??
+              BorderRadius.circular(widget.radius),
         ),
         BoxDecoration(
           color: widget.decoration?.color ??
@@ -322,7 +326,8 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
               Theme.of(context).colorScheme.secondary,
           boxShadow: widget.decoration?.boxShadow,
           gradient: widget.decoration?.gradient,
-          borderRadius: widget.decoration?.borderRadius ?? BorderRadius.circular(widget.radius),
+          borderRadius: widget.decoration?.borderRadius ??
+              BorderRadius.circular(widget.radius),
         ),
         animationValue);
 
@@ -351,7 +356,6 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
       );
     }
 
-
     return Padding(
       key: _tabKeys[index],
       // padding for the buttons
@@ -372,10 +376,10 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
                 side: (widget.borderWidth == 0)
                     ? BorderSide.none
                     : BorderSide(
-                        color: borderColor ?? Colors.black,
-                        width: widget.borderWidth,
-                        style: BorderStyle.solid,
-                      ),
+                  color: borderColor ?? Colors.black,
+                  width: widget.borderWidth,
+                  style: BorderStyle.solid,
+                ),
                 borderRadius: BorderRadius.circular(widget.radius),
               ),
             ),
@@ -389,20 +393,25 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
               children: <Widget>[
                 tab.icon != null
                     ? IconTheme.merge(
-                        data: IconThemeData(size: 24.0, color: foregroundColor),
-                        child: tab.icon!)
+                    data: IconThemeData(size: 24.0, color: foregroundColor),
+                    child: tab.icon!)
                     : Container(),
                 SizedBox(
                   width: tab.icon == null ||
-                          (tab.text == null && tab.child == null)
+                      (tab.text == null && tab.child == null)
                       ? 0
                       : widget.labelSpacing,
                 ),
                 tab.text != null
-                    ? Text(
-                        tab.text!,
-                        style: textStyle,
-                      )
+                    ? SizedBox(
+                  width: widget.width ?? 0,
+                  child: Center(
+                    child: Text(
+                      tab.text!,
+                      style: textStyle,
+                    ),
+                  ),
+                )
                     : (tab.child ?? Container())
               ],
             ),
@@ -418,7 +427,7 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
       if (_controller!.length != widget.tabs.length) {
         throw FlutterError(
             "Controller's length property (${_controller!.length}) does not match the "
-            "number of tabs (${widget.tabs.length}) present in TabBar's tabs property.");
+                "number of tabs (${widget.tabs.length}) present in TabBar's tabs property.");
       }
       return true;
     }());
@@ -443,7 +452,7 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
               mainAxisSize: MainAxisSize.min,
               children: List.generate(
                 widget.tabs.length,
-                (int index) => _buildButton(index, widget.tabs[index] as Tab),
+                    (int index) => _buildButton(index, widget.tabs[index] as Tab),
               ),
             ),
           ),
@@ -455,8 +464,8 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
   // runs during the switching tabs animation
   _handleTabAnimation() {
     _aniIndex = ((_controller!.animation!.value > _prevAniValue)
-            ? _controller!.animation!.value
-            : _prevAniValue)
+        ? _controller!.animation!.value
+        : _prevAniValue)
         .round();
     if (!_controller!.indexIsChanging && _aniIndex != _currentIndex) {
       _setCurrentIndex(_aniIndex);
@@ -492,7 +501,7 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
   _scrollTo(int index) {
     // get the screen width. This is used to check if we have an element off screen
     final RenderBox tabsContainer =
-        _tabsContainerKey.currentContext!.findRenderObject() as RenderBox;
+    _tabsContainerKey.currentContext!.findRenderObject() as RenderBox;
     double screenWidth = tabsContainer.size.width;
     final tabsContainerPosition = tabsContainer.localToGlobal(Offset.zero).dx;
     // get the TabsContainer offset (for cases when padding is used)
@@ -500,7 +509,7 @@ class _ButtonsTabBarState extends State<ButtonsTabBar>
 
     // get the button we want to scroll to
     RenderBox renderBox =
-        _tabKeys[index].currentContext?.findRenderObject() as RenderBox;
+    _tabKeys[index].currentContext?.findRenderObject() as RenderBox;
     // get its size
     double size = renderBox.size.width;
     // and position
